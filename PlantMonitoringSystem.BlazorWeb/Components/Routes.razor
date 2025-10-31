@@ -1,0 +1,12 @@
+﻿<ThemeProvider Theme=BlazoriseTheme>
+    <Router AppAssembly=typeof(Program).Assembly>
+        <Found Context="route_data">
+            <RouteView RouteData=route_data DefaultLayout=typeof(Layout.MainLayout) />
+        </Found>
+    </Router>
+</ThemeProvider>
+
+@code
+{
+    public Blazorise.Theme BlazoriseTheme { get; set; } = new();
+}

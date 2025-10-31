@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <base href="/" />
+        <link rel="stylesheet" href="@Assets["app.css"]" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.4/dist/flowbite.min.css" />
+        <link href="_content/Blazorise.Icons.FontAwesome/v6/css/all.min.css" rel="stylesheet">
+        <link href="_content/Blazorise/blazorise.css?v=1.8.5.0" rel="stylesheet" />
+        <link href="_content/Blazorise.Tailwind/blazorise.tailwind.prod.css?v=1.8.5.0" rel="stylesheet" />
+        <ImportMap />
+        <HeadOutlet @rendermode="InteractiveServer" />
+        <RadzenTheme Theme="material" />
+    </head>
+    <body>
+        <Routes @rendermode="InteractiveServer" />
+        <script src="_framework/blazor.web.js"></script>
+        <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+    </body>
+</html>

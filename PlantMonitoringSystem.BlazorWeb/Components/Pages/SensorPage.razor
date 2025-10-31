@@ -1,0 +1,69 @@
+﻿@page "/User/Plant/Sensor"
+
+<Layout>
+    <LayoutContent Class="flex flex-row items-center justify-center">
+        <Div Class="flex flex-col items-start justify-center space-y-2">
+            <Div>Press the reset button on sensor device.</Div>
+            <Div>Connect to the access point of the sensor device.</Div>
+            <Div>Check the connection state by pressing button under.</Div>
+            <Addons Class="self-center rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Button Class="bg-blue-400 text-xl !text-black">Check connection</Button>
+                </Addon>
+                <Addon AddonType=AddonType.End>
+                    <Button Class="bg-yellow-300 text-xl !text-black">Bind sensors</Button>
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="ml-1">Connection state</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <Text Class="ml-1 flex flex-row items-center justify-start text-2xl text-red-500">Disconnected</Text>
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">User ID</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@UserId</Text>
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Plant ID</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@PlantId</Text>
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Wi-Fi</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <TextEdit @bind-Text=Name />
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Password</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <TextEdit @bind-Text=Password Role=TextRole.Password />
+                </Addon>
+            </Addons>
+            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-blue-400">Save</Button>
+            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-red-500">Discard</Button>
+        </Div>
+    </LayoutContent>
+</Layout>
+
+@code
+{
+    private string Name { get; set; } = string.Empty;
+    private string UserId { get; set; } = Guid.NewGuid().ToString();
+    private string PlantId { get; set; } = Guid.NewGuid().ToString();
+    private string Password { get; set; } = string.Empty;
+}

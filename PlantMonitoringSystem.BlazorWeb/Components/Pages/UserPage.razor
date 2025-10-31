@@ -1,0 +1,55 @@
+﻿@page "/User"
+@inject NavigationManager Navigator
+
+<Layout Sider>
+    <LayoutSider>
+        <LayoutSiderContent Class="flex flex-col space-y-2 bg-pink-300 p-1">
+            <Div Class="aspect-square w-[95%] self-center rounded border border-gray-900 bg-gray-300" />
+            <Addons>
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Name</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <TextEdit @bind-Text=Name />
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">ID</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@Id</Text>
+                </Addon>
+            </Addons>
+            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-blue-400">Save</Button>
+        </LayoutSiderContent>
+    </LayoutSider>
+    <LayoutContent Class="flex flex-col space-y-1 overflow-auto p-1">
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <PlantListItem />
+        <Button Clicked=NavigateToPlantPage Class="flex flex-row justify-center rounded border border-black bg-blue-300 text-2xl">Add Plant</Button>
+    </LayoutContent>
+</Layout>
+
+@code
+{
+    public string Name { get; set; } = "Plant Name";
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+
+    private void NavigateToPlantPage()
+    {
+        Navigator.NavigateTo("/User/Plant");
+    }
+}

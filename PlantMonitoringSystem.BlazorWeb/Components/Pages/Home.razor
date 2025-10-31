@@ -1,0 +1,10 @@
+﻿@page "/"
+@inject NavigationManager Navigator
+
+<PageTitle>Home</PageTitle>
+<Layout>
+    <LayoutContent Class="m-2 text-3xl">Welcome</LayoutContent>
+</Layout>
+@{
+    Navigator.NavigateTo("/User");
+}

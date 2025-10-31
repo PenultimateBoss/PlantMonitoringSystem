@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/PlantMonitoringSystem.BlazorWeb/tailwind.extension.json
+/PlantMonitoringSystem.BlazorWeb/tailwind.css
+/PlantMonitoringSystem.BlazorWeb/package-lock.json
+/PlantMonitoringSystem.BlazorWeb/package.json

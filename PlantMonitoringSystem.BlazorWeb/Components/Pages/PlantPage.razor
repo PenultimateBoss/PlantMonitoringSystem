@@ -1,0 +1,201 @@
+﻿@page "/User/Plant"
+@inject NavigationManager Navigator
+
+<Layout Sider>
+    <LayoutSider>
+        <LayoutSiderContent Class="flex flex-col space-y-2 bg-pink-300 p-1">
+            <Div Class="aspect-square w-[95%] self-center rounded border border-gray-900 bg-gray-300" />
+            <Addons>
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Name</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <TextEdit @bind-Text=Name />
+                </Addon>
+            </Addons>
+            <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">ID</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@Id</Text>
+                </Addon>
+            </Addons>
+            <Addons>
+                <Addon AddonType=AddonType.Start>
+                    <Text Class="mx-1">Measure period</Text>
+                </Addon>
+                <Addon AddonType=AddonType.Body>
+                    <NumericEdit TValue="int" Min=1 @bind-Value=Period />
+                </Addon>
+                <Addon AddonType=AddonType.End>
+                    <Dropdown>
+                        <DropdownToggle>@PeriodSelection</DropdownToggle>
+                        <DropdownMenu>
+                            <DropdownItem Clicked=@(void () => { PeriodSelection = TimeType.Minute; })>@TimeType.Minute</DropdownItem>
+                            <DropdownItem Clicked=@(void () => { PeriodSelection = TimeType.Hour; })>@TimeType.Hour</DropdownItem>
+                            <DropdownItem Clicked=@(void () => { PeriodSelection = TimeType.Day; })>@TimeType.Day</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </Addon>
+            </Addons>          
+            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-blue-400">Save</Button>
+            <Button Block Clicked=NavigateToSensorPage Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-yellow-400">Sensors</Button>
+            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-red-500">Delete</Button>
+        </LayoutSiderContent>
+    </LayoutSider>
+    <LayoutContent Class="flex flex-col">
+        <Div Class="p-1 text-3xl text-gray-400">Last updated: @DateTime.Now</Div>
+        <Div Class="flex flex-row justify-around p-1">
+            @if(Tab is ChartTab.Light)
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Light; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-yellow-400 text-xl bg-yellow-200">Light: 50%</Button>       
+            }
+            else
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Light; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-yellow-400 text-xl">Light: 50%</Button>           
+            }
+            @if(Tab is ChartTab.Moisture)
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Moisture; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-green-600 text-xl bg-green-300">Moisture: 50%</Button>
+            }
+            else
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Moisture; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-green-600 text-xl">Moisture: 50%</Button>
+            }
+            @if(Tab is ChartTab.Temperature)
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Temperature; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-red-600 text-xl bg-red-300">Temperature: 20C</Button>          
+            }
+            else
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Temperature; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-red-600 text-xl">Temperature: 20C</Button>      
+            }
+            @if(Tab is ChartTab.Humidity)
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Humidity; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-blue-600 text-xl bg-blue-300">Humidity: 50%</Button>
+            }
+            else
+            {
+                <Button Clicked=@(void() => { Tab = ChartTab.Humidity; })
+                    Class="flex w-1/5 flex-row items-center justify-center rounded border-2 border-blue-600 text-xl">Humidity: 50%</Button>
+            }        
+        </Div>
+        <Fields Class="!mx-0">
+            <Field Horizontal Class="flex flex-row items-center justify-center dark:bg-stone-600">
+                <FieldLabel Class="ml-1">Markers</FieldLabel>
+                <FieldBody Class="ml-1 flex flex-row items-center">
+                    <Check TValue="bool" @bind-Checked=Markers />
+                </FieldBody>
+            </Field>
+            <Field Horizontal Class="flex flex-row items-center justify-center dark:bg-stone-600">
+                <FieldLabel>Data Labels</FieldLabel>
+                <FieldBody Class="ml-1 flex flex-row items-center">
+                    <Check TValue="bool" @bind-Checked=DataLabels />
+                </FieldBody>
+            </Field>
+            <Field>
+                <Addons>
+                    <Addon AddonType=AddonType.Body>
+                        <NumericEdit TValue="int" Min=1 @bind-Value=Time />
+                    </Addon>
+                    <Addon AddonType=AddonType.End>
+                        <Dropdown>
+                            <DropdownToggle>@TimeSelection</DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem Clicked=@(void() => { TimeSelection = TimeType.Minute; })>@TimeType.Minute</DropdownItem>
+                                <DropdownItem Clicked=@(void() => { TimeSelection = TimeType.Hour; })>@TimeType.Hour</DropdownItem>
+                                <DropdownItem Clicked=@(void() => { TimeSelection = TimeType.Day; })>@TimeType.Day</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </Addon>
+                </Addons>
+            </Field>
+        </Fields>
+        <Div Class="grow">
+            <RadzenChart class="!h-full">
+                <RadzenLineSeries Smooth TItem="Items" Title=@($"{Tab}") CategoryProperty="X" ValueProperty="Y" Data=Points>
+                    <RadzenMarkers Visible=Markers MarkerType=MarkerType.Circle />
+                    <RadzenSeriesDataLabels Visible=DataLabels />
+                </RadzenLineSeries>
+                <RadzenCategoryAxis Padding=20 Formatter=XFormatter>
+                    <RadzenAxisTitle Text="Time" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis Formatter=YFormatter>
+                    <RadzenGridLines Visible />
+                    <RadzenAxisTitle Text="Values" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </Div>
+    </LayoutContent>
+</Layout>
+
+@code
+{
+    private bool Markers { get; set; } = true;
+    private bool DataLabels { get; set; } = true;
+    private int Time { get; set; } = 1;
+    private int Period { get; set; } = 1;
+    public ChartTab Tab { get; set; }
+    public TimeType TimeSelection { get; set; }
+    public TimeType PeriodSelection { get; set; }
+    public string Name { get; set; } = "Plant Name";
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public List<Items> Points { get; set; } = [
+        new Items(DateTime.Now.AddMinutes(0), 5), 
+        new Items(DateTime.Now.AddMinutes(5), 10), 
+        new Items(DateTime.Now.AddMinutes(10), 20),
+        new Items(DateTime.Now.AddMinutes(15), 15),
+        new Items(DateTime.Now.AddMinutes(20), 50),
+        new Items(DateTime.Now.AddMinutes(25), 55),    
+        new Items(DateTime.Now.AddMinutes(30), 70),       
+        new Items(DateTime.Now.AddMinutes(35), 80),        
+        new Items(DateTime.Now.AddMinutes(40), 75),       
+        new Items(DateTime.Now.AddMinutes(45), 45),       
+        new Items(DateTime.Now.AddMinutes(50), 65),
+        new Items(DateTime.Now.AddMinutes(55), 25),
+    ];
+
+    private string XFormatter(object value)
+    {
+        DateTime time = (DateTime)value;
+        return $"{time.Hour:D2}:{time.Minute:D2}";
+    }
+    private string YFormatter(object value)
+    {
+        if(Tab is ChartTab.Temperature)
+        {
+            return $"{value}C";
+        }
+        else
+        {
+            return $"{value}%";
+        }
+    }
+    private void NavigateToSensorPage()
+    {
+        Navigator.NavigateTo("/User/Plant/Sensor");
+    }
+
+    public enum TimeType
+    {
+        Minute,
+        Hour,
+        Day
+    }
+    public enum ChartTab
+    {
+        Light,
+        Moisture,
+        Temperature,
+        Humidity
+    }
+    public readonly record struct Items(DateTime X, int Y);
+}
