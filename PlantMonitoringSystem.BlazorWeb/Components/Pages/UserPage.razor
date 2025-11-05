@@ -1,6 +1,20 @@
 ﻿@page "/"
 @page "/User"
 @inject NavigationManager Navigator
+@inject ApplicationDbContext DbContext
+@code
+{
+    protected override void OnInitialized()
+    {
+        if(DbContext.Users.Include(u => u.Plants).FirstOrDefault() is not User user)
+        {
+            user = new User();
+            DbContext.Users.Add(user);
+            DbContext.SaveChanges();
+        }
+        User = user;
+    }
+}
 
 <Layout Sider>
     <LayoutSider>
@@ -11,7 +25,7 @@
                     <Text Class="mx-1">Name</Text>
                 </Addon>
                 <Addon AddonType=AddonType.Body>
-                    <TextEdit @bind-Text=Name />
+                    <TextEdit @bind-Text=User.Name />
                 </Addon>
             </Addons>
             <Addons Class="w-full rounded-[10px] border-2 border-gray-900">
@@ -19,24 +33,30 @@
                     <Text Class="mx-1">ID</Text>
                 </Addon>
                 <Addon AddonType=AddonType.Body>
-                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@Id</Text>
+                    <Text Class="mx-1 flex w-full flex-row items-center justify-start">@User.Id</Text>
                 </Addon>
             </Addons>
-            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-blue-400">Save</Button>
         </LayoutSiderContent>
     </LayoutSider>
     <LayoutContent Class="flex flex-col space-y-1 overflow-auto p-1">
+        @foreach(Plant plant in User.Plants)
+        {
+            <PlantListItem Plant=plant />
+        }
         <Button Clicked=AddPlant Class="flex flex-row justify-center rounded border border-black bg-blue-300 text-2xl">Add Plant</Button>
     </LayoutContent>
 </Layout>
 
 @code
 {
-    public string Name { get; set; } = "Plant Name";
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public User User { get; set; } = null!;
 
     private void AddPlant()
     {
-        Navigator.NavigateTo("/User/Plant");
+        Plant plant = new();
+        User.Plants.Add(plant);
+        DbContext.SaveChanges();
+        plant = User.Plants.Last();
+        Navigator.NavigateTo($"/User/Plant/{plant.Id}");
     }
 }

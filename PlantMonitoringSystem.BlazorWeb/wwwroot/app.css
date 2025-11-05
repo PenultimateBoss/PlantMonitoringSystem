@@ -25,8 +25,6 @@
     --color-stone-600: oklch(44.4% 0.011 73.639);
     --color-black: #000;
     --spacing: 0.25rem;
-    --text-lg: 1.125rem;
-    --text-lg--line-height: calc(1.75 / 1.125);
     --text-xl: 1.25rem;
     --text-xl--line-height: calc(1.75 / 1.25);
     --text-2xl: 1.5rem;
@@ -188,9 +186,6 @@
 @layer utilities {
   .static {
     position: static;
-  }
-  .m-2 {
-    margin: calc(var(--spacing) * 2);
   }
   .\!mx-0 {
     margin-inline: calc(var(--spacing) * 0) !important;
@@ -385,12 +380,6 @@
   .outline {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
-  }
-  .data-\[border\]\:border {
-    &[data-border] {
-      border-style: var(--tw-border-style);
-      border-width: 1px;
-    }
   }
   .dark\:bg-stone-600 {
     @media (prefers-color-scheme: dark) {

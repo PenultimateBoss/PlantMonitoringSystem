@@ -3,15 +3,17 @@
 <Button Class="flex flex-row items-center rounded border border-black bg-green-300 p-1" @onclick=NavigateToPlantPage>
     <Div Class="h-[50px] w-[50px] rounded border border-black bg-gray-300" />
     <Div Class="ml-2 flex flex-col items-start justify-between">
-        <Div Class="text-xl">Plant</Div>
-        <Div Class="text-[10px]">ID: @Guid.NewGuid()</Div>
+        <Div Class="text-xl">@Plant.Name</Div>
+        <Div Class="text-[10px]">@Plant.Id</Div>
     </Div>
 </Button>
 
 @code
 {
+    [Parameter] public required Plant Plant { get; set; }
+
     private void NavigateToPlantPage()
     {
-        Navigator.NavigateTo("/User/Plant");
+        Navigator.NavigateTo($"/User/Plant/{Plant.Id}");
     }
 }

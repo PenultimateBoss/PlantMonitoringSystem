@@ -1,4 +1,5 @@
-﻿@page "/User/Plant/{PlantId:guid}"
+﻿@rendermode @(InteractiveServer)
+@page "/User/Plant/{PlantId:guid}"
 @inject ApplicationDbContext DbContext
 @inject NavigationManager Navigator
 @code
@@ -10,7 +11,7 @@
         Plant = DbContext.Plants.Include(p => p.Records).Include(p => p.User).First(plant => plant.Id == PlantId);
         if(Plant.Records.Count() is 0)
         {            
-            for(int index = 0; index < 500; index++)
+            for(int index = 0; index < 60; index++)
             {
                 SensorRecord record = new()
                 {
@@ -18,7 +19,7 @@
                     Moisture = (byte)Random.Shared.Next(20, 80),
                     Temperature = (byte)Random.Shared.Next(10, 30),
                     Humidity = (byte)Random.Shared.Next(20, 80),
-                    UpdateTime = 1,
+                    UpdateTime = 5,
                 };
                 Plant.Records.Add(record);
             }
@@ -59,7 +60,7 @@
                     <Text Class="p-1">Minute</Text>
                 </Addon>
             </Addons>
-            <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-yellow-400">Sensors</Button>
+            <Button Block Clicked=NavigateToSensorPage Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-yellow-400">Sensors</Button>
             <Button Block Clicked=DeletePlant Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-red-500">Delete</Button>
         </LayoutSiderContent>
     </LayoutSider>
@@ -194,16 +195,10 @@
             </Field>
             <Field>
                 <Dropdown>
-                    <DropdownToggle>@(Period switch
-                    {
-                        TimePeriod.LastHour => "Last hour",
-                        TimePeriod.LastDay => "Last day",
-                        _ => ""
-                    })
-                    </DropdownToggle>
+                    <DropdownToggle>@Period</DropdownToggle>
                     <DropdownMenu>
-                        <DropdownItem Clicked=@(void() => { Period = TimePeriod.LastHour; UpdateChart(); })>Last hour</DropdownItem>
-                        <DropdownItem Clicked=@(void() => { Period = TimePeriod.LastDay; UpdateChart(); })>Last day</DropdownItem>
+                        <DropdownItem Clicked=@(void() => { Period = TimePeriod.LastHour; UpdateChart(); })>@TimePeriod.LastHour</DropdownItem>
+                        <DropdownItem Clicked=@(void() => { Period = TimePeriod.LastDay; UpdateChart(); })>@TimePeriod.LastDay</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </Field>
@@ -258,6 +253,10 @@
         {
             return $"{value}%";
         }
+    }
+    private void NavigateToSensorPage()
+    {
+        Navigator.NavigateTo($"/User/{Plant.UserId}/Plant/{Plant.Id}/Sensor");
     }
     public void UpdateChart()
     {
