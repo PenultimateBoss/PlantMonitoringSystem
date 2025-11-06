@@ -1,30 +1,61 @@
 ﻿@page "/User/Plant/{PlantId:guid}"
 @inject ApplicationDbContext DbContext
 @inject NavigationManager Navigator
+@namespace System.Buffers
 @code
 {
     [Parameter] public Guid PlantId { get; set; }
 
     protected override void OnInitialized()
     {
-        Plant = DbContext.Plants.Include(p => p.Records).Include(p => p.User).First(plant => plant.Id == PlantId);
-        if(Plant.Records.Count() is 0)
-        {            
-            for(int index = 0; index < 500; index++)
+        MQTTnet.MqttClientFactory factory = new();
+        MQTTnet.IMqttClient client = factory.CreateMqttClient();
+        client.ConnectAsync(factory.CreateClientOptionsBuilder()
+            .WithTlsOptions(o =>
             {
-                SensorRecord record = new()
+                o.UseTls();
+                o.WithTargetHost("a1dbba6f9d5e4994b07a1c2d4b3a7db7.s1.eu.hivemq.cloud:8883");
+                o.WithSslProtocols(System.Security.Authentication.SslProtocols.Tls12);
+                o.WithAllowUntrustedCertificates();
+            })
+            .WithClientId("PlantServer")
+            .WithCredentials("mandarun", "Mandarun31").Build());
+        client.SubscribeAsync(factory.CreateSubscribeOptionsBuilder()
+            .WithTopicFilter(f =>
+            {
+                f.WithTopic($"sensor/data");
+                f.WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
+            }).Build());
+        client.ApplicationMessageReceivedAsync += async e =>
+        {
+            string payload = System.Text.Encoding.UTF8.GetString(e.ApplicationMessage.Payload.ToArray());
+            string[] parts = payload.Split(';');
+            if(parts.Length is 5 && Guid.TryParse(parts[0], out Guid plant_id))
+            {
+                Plant? plant = DbContext.Plants.Include(p => p.Records).FirstOrDefault(p => p.Id == plant_id);
+                if(plant is not null)
                 {
-                    Light = (byte)Random.Shared.Next(20, 80),
-                    Moisture = (byte)Random.Shared.Next(20, 80),
-                    Temperature = (byte)Random.Shared.Next(10, 30),
-                    Humidity = (byte)Random.Shared.Next(20, 80),
-                    UpdateTime = 1,
-                };
-                Plant.Records.Add(record);
+                    SensorRecord record = new()
+                    {
+                        Light = byte.Parse(parts[1]),
+                        Moisture = byte.Parse(parts[2]),
+                        Temperature = byte.Parse(parts[3]),
+                        Humidity = byte.Parse(parts[4]),
+                        UpdateTime = plant.UpdatePeriod,
+                    };
+                    plant.Records.Add(record);
+                    plant.LastUpdated = DateTime.Now;
+                    DbContext.SaveChanges();
+                    if(plant.Id == PlantId)
+                    {
+                        LastRecord = record;
+                        UpdateChart();
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
             }
-            LastRecord = Plant.Records.LastOrDefault();
-            UpdateChart();
-        }
+		};
+        Plant = DbContext.Plants.Include(p => p.Records).Include(p => p.User).First(plant => plant.Id == PlantId);
     }
 }
 
