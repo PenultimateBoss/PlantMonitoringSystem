@@ -1,68 +1,78 @@
 ﻿@page "/User/Plant/{PlantId:guid}"
 @inject ApplicationDbContext DbContext
 @inject NavigationManager Navigator
-@namespace System.Buffers
+@inject ILogger<PlantPage> Logger
+@using System.Buffers
+@using System.Text
 @code
 {
     [Parameter] public Guid PlantId { get; set; }
+    public MQTTnet.IMqttClient Client { get; set; } = null!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        Logger.LogInformation("Fetch plant from database");
+        Plant = DbContext.Plants.Include(p => p.Records).Include(p => p.User).First(plant => plant.Id == PlantId);
+        UpdateChart();
         MQTTnet.MqttClientFactory factory = new();
-        MQTTnet.IMqttClient client = factory.CreateMqttClient();
-        client.ConnectAsync(factory.CreateClientOptionsBuilder()
+        Client = factory.CreateMqttClient();
+        Logger.LogInformation("Connect to MQTT");
+        MQTTnet.MqttClientConnectResult result = await Client.ConnectAsync(factory.CreateClientOptionsBuilder()
+            .WithTcpServer("62df834cd0c74c3bbfdf9d5e3ec98238.s1.eu.hivemq.cloud", 8883)
             .WithTlsOptions(o =>
             {
                 o.UseTls();
-                o.WithTargetHost("a1dbba6f9d5e4994b07a1c2d4b3a7db7.s1.eu.hivemq.cloud:8883");
                 o.WithSslProtocols(System.Security.Authentication.SslProtocols.Tls12);
                 o.WithAllowUntrustedCertificates();
             })
             .WithClientId("PlantServer")
-            .WithCredentials("mandarun", "Mandarun31").Build());
-        client.SubscribeAsync(factory.CreateSubscribeOptionsBuilder()
+            .WithCredentials("MQ-Client", "MQ-Client00").Build());
+        Logger.LogInformation("Subscribe to MQTT");
+        await Client.SubscribeAsync(factory.CreateSubscribeOptionsBuilder()
             .WithTopicFilter(f =>
             {
-                f.WithTopic($"sensor/data");
+                f.WithTopic($"sensors/data");
                 f.WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
             }).Build());
-        client.ApplicationMessageReceivedAsync += async e =>
-        {
-            string payload = System.Text.Encoding.UTF8.GetString(e.ApplicationMessage.Payload.ToArray());
-            string[] parts = payload.Split(';');
-            if(parts.Length is 5 && Guid.TryParse(parts[0], out Guid plant_id))
+        Client.ApplicationMessageReceivedAsync += async e =>
+        {         
+            Logger.LogInformation("Got message from MQTT");
+            byte[] payload = e.ApplicationMessage.Payload.ToArray();
+            Plant? plant = DbContext.Plants.Include(p => p.Records).FirstOrDefault(p => p.Id == PlantId);
+            if(plant is not null)
             {
-                Plant? plant = DbContext.Plants.Include(p => p.Records).FirstOrDefault(p => p.Id == plant_id);
-                if(plant is not null)
+                SensorRecord record = new()
                 {
-                    SensorRecord record = new()
-                    {
-                        Light = byte.Parse(parts[1]),
-                        Moisture = byte.Parse(parts[2]),
-                        Temperature = byte.Parse(parts[3]),
-                        Humidity = byte.Parse(parts[4]),
-                        UpdateTime = plant.UpdatePeriod,
-                    };
-                    plant.Records.Add(record);
-                    plant.LastUpdated = DateTime.Now;
-                    DbContext.SaveChanges();
-                    if(plant.Id == PlantId)
-                    {
-                        LastRecord = record;
-                        UpdateChart();
-                        await InvokeAsync(StateHasChanged);
-                    }
+                    Light = payload[0],
+                    Moisture = payload[1],
+                    Temperature = payload[2],
+                    Humidity = payload[3],
+                    UpdateTime = payload[4],
+                };
+                plant.Records.Add(record);
+                plant.LastUpdated = DateTime.Now;
+                DbContext.SaveChanges();
+                if(plant.Id == PlantId)
+                {
+                    LastRecord = record;
+                    UpdateChart();
+                    await InvokeAsync(StateHasChanged);
                 }
             }
-		};
-        Plant = DbContext.Plants.Include(p => p.Records).Include(p => p.User).First(plant => plant.Id == PlantId);
+        };
+        await Client.PublishAsync(new MQTTnet.MqttApplicationMessage()
+        {
+            Topic = "server/data",
+            QualityOfServiceLevel = MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce,
+            Payload = new(Encoding.UTF8.GetBytes("Server connected")),
+        });
     }
 }
 
 <Layout Sider>
     <LayoutSider>
         <LayoutSiderContent Class="flex flex-col space-y-2 bg-pink-300 p-1">
-            <Div Class="aspect-square w-[95%] self-center rounded border border-gray-900 bg-gray-300" />
+            <Image Source="PlantPhoto.jpg" Class="aspect-square w-[95%] max-w-[300px] self-center rounded border border-gray-900" />
             <Addons>
                 <Addon AddonType=AddonType.Start>
                     <Text Class="mx-1">Name</Text>
@@ -77,17 +87,6 @@
                 </Addon>
                 <Addon AddonType=AddonType.Body>
                     <Text Class="mx-1 flex w-full flex-row items-center justify-start">@Plant.Id</Text>
-                </Addon>
-            </Addons>
-            <Addons>
-                <Addon AddonType=AddonType.Start>
-                    <Text Class="mx-1">Measure period</Text>
-                </Addon>
-                <Addon AddonType=AddonType.Body>
-                    <NumericEdit TValue="int" Min=1 @bind-Value=Plant.UpdatePeriod />
-                </Addon>
-                <Addon AddonType=AddonType.End>
-                    <Text Class="p-1">Minute</Text>
                 </Addon>
             </Addons>
             <Button Block Class="flex flex-row items-center justify-center rounded border-2 border-gray-900 bg-yellow-400">Sensors</Button>
@@ -270,6 +269,7 @@
 
     public void DeletePlant()
     {
+        Logger.LogInformation("Delete plant from database");
         DbContext.Plants.Remove(Plant);
         DbContext.SaveChanges();
         Navigator.NavigateTo("/User");
@@ -292,6 +292,7 @@
     }
     public void UpdateChart()
     {
+        Logger.LogInformation("Update chart");
         if(Period is TimePeriod.LastHour)
         {
             int update_time = 0;

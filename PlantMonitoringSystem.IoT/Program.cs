@@ -51,19 +51,27 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
             AdcChannel moisture = controller.OpenChannel(5);
             Dht11 dht11 = new(25, 26);
             X509Certificate cert = new(Cert);
-            WifiNetworkHelper.ConnectDhcp("CISPE-PHONE", "11111111");
-            MqttClient client = new("a1dbba6f9d5e4994b07a1c2d4b3a7db7.s1.eu.hivemq.cloud", 8883, true, cert, null, MqttSslProtocols.TLSv1_2);
-            client.Connect("NF", "mandarun", "Mandarun31", true, 60);
-            byte[] message = new byte[]
+            while(true)
             {
-                (byte)light.ReadRatio(),
-                (byte)moisture.ReadRatio(),
-                (byte)dht11.Temperature.DegreesCelsius,
-                (byte)dht11.Humidity.Percent,
-                (byte)1,
-            };
-            client.Publish("sensors/data", message, "", new System.Collections.ArrayList(), nanoFramework.M2Mqtt.Messages.MqttQoSLevel.AtLeastOnce, false);
-            Thread.Sleep(10000);
+                try
+                {
+                    WifiNetworkHelper.ConnectDhcp("CISPE-PHONE", "11111111");
+                    MqttClient client = new("62df834cd0c74c3bbfdf9d5e3ec98238.s1.eu.hivemq.cloud", 8883, true, cert, null, MqttSslProtocols.TLSv1_2);
+                    client.Connect("NF", "NF-Client", "NF-Client00", true, 60);
+                    byte[] message = new byte[]
+                    {
+                        (byte)(light.ReadRatio() * 100),
+                        (byte)(moisture.ReadRatio() * 100),
+                        (byte)dht11.Temperature.DegreesCelsius,
+                        (byte)dht11.Humidity.Percent,
+                        (byte)1,
+                    };
+                    client.Publish("sensors/data", message, "", new System.Collections.ArrayList(), nanoFramework.M2Mqtt.Messages.MqttQoSLevel.AtLeastOnce, false);
+                    Thread.Sleep(10000);
+                    break;
+                }
+                catch { }
+            }
             Sleep.EnableWakeupByTimer(System.TimeSpan.FromMinutes(1));
             Sleep.StartDeepSleep();
         }

@@ -2,12 +2,15 @@
 @page "/User"
 @inject NavigationManager Navigator
 @inject ApplicationDbContext DbContext
+@inject ILogger<UserPage> Logger
 @code
 {
     protected override void OnInitialized()
     {
+        Logger.LogInformation("Fetch user from database");
         if(DbContext.Users.Include(u => u.Plants).FirstOrDefault() is not User user)
         {
+            Logger.LogInformation("Create user in database");
             user = new User();
             DbContext.Users.Add(user);
             DbContext.SaveChanges();
@@ -19,7 +22,7 @@
 <Layout Sider>
     <LayoutSider>
         <LayoutSiderContent Class="flex flex-col space-y-2 bg-pink-300 p-1">
-            <Div Class="aspect-square w-[95%] self-center rounded border border-gray-900 bg-gray-300" />
+            <Div Class="flex aspect-square w-[95%] flex-row items-center justify-center self-center rounded border border-gray-900 bg-gray-300">User photo</Div>
             <Addons>
                 <Addon AddonType=AddonType.Start>
                     <Text Class="mx-1">Name</Text>
@@ -53,6 +56,7 @@
 
     private void AddPlant()
     {
+        Logger.LogInformation("Add plant to database");
         Plant plant = new();
         User.Plants.Add(plant);
         DbContext.SaveChanges();

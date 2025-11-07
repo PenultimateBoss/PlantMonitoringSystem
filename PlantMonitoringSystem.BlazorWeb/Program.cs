@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection_string);
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddLogging();
 
 WebApplication app = builder.Build();
 if(app.Environment.IsDevelopment() is false)
