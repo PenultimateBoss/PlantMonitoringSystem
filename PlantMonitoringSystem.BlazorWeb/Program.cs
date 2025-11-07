@@ -7,6 +7,8 @@ using PlantMonitoringSystem.BlazorWeb.Data;
 using PlantMonitoringSystem.BlazorWeb.Components;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddBlazorise().AddTailwindProviders().AddFontAwesomeIcons();
 builder.Services.AddRadzenComponents();
@@ -20,11 +22,28 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddLogging();
 
 WebApplication app = builder.Build();
+app.MapDefaultEndpoints();
 if(app.Environment.IsDevelopment() is false)
 {
     app.UseMigrationsEndPoint();
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
+}
+else
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+        logger.LogInformation("Database migrations applied.");
+    }
+    catch(Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while migrating the database.");
+        throw;
+    }
 }
 app.UseHttpsRedirection();
 app.UseAntiforgery();

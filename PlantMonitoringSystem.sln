@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantMonitoringSystem.Blazo
 EndProject
 Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "PlantMonitoringSystem.IoT", "PlantMonitoringSystem.IoT\PlantMonitoringSystem.IoT.nfproj", "{E0BCB934-B541-451E-9455-EDE6595F9A79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantMonitoringSystem.Aspire.AppHost", "PlantMonitoringSystem.Aspire\PlantMonitoringSystem.Aspire.AppHost\PlantMonitoringSystem.Aspire.AppHost.csproj", "{FE6DE777-9A29-4E26-8C48-B15D5C3447E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantMonitoringSystem.Aspire.ServiceDefaults", "PlantMonitoringSystem.Aspire\PlantMonitoringSystem.Aspire.ServiceDefaults\PlantMonitoringSystem.Aspire.ServiceDefaults.csproj", "{2D63AC3A-0ED0-9A58-3713-5CD9E8C25EC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{E0BCB934-B541-451E-9455-EDE6595F9A79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0BCB934-B541-451E-9455-EDE6595F9A79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0BCB934-B541-451E-9455-EDE6595F9A79}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{FE6DE777-9A29-4E26-8C48-B15D5C3447E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE6DE777-9A29-4E26-8C48-B15D5C3447E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE6DE777-9A29-4E26-8C48-B15D5C3447E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE6DE777-9A29-4E26-8C48-B15D5C3447E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D63AC3A-0ED0-9A58-3713-5CD9E8C25EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D63AC3A-0ED0-9A58-3713-5CD9E8C25EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D63AC3A-0ED0-9A58-3713-5CD9E8C25EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D63AC3A-0ED0-9A58-3713-5CD9E8C25EC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
